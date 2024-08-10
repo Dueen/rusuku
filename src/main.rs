@@ -1,10 +1,10 @@
 use ratatui::{
     buffer::Buffer,
     crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind},
-    layout::{Alignment, Rect},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::Stylize,
     symbols::border,
-    widgets::{block::Title, Block, Widget},
+    widgets::{block::Title, Block, Borders, Widget},
     Frame,
 };
 use std::io;
@@ -65,12 +65,39 @@ impl App {
 impl Widget for &App {
     fn render(self, area: Rect, buf: &mut Buffer) {
         let title = Title::from(" Welcome to Rusuku ".bold());
+        let layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(vec![Constraint::Percentage(15), Constraint::Percentage(85)])
+            .split(area);
 
-        let block = Block::bordered()
+        let header_layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(vec![
+                Constraint::Percentage(33),
+                Constraint::Percentage(34),
+                Constraint::Percentage(33),
+            ])
+            .split(layout[0]);
+
+        Block::default()
+            .borders(Borders::ALL)
+            .border_set(border::THICK)
+            .render(header_layout[0], buf);
+
+        Block::bordered()
             .title(title.alignment(Alignment::Center))
-            .border_set(border::THICK);
+            .borders(Borders::TOP | Borders::BOTTOM)
+            .border_set(border::THICK)
+            .render(header_layout[1], buf);
 
-        block.render(area, buf);
+        Block::default()
+            .borders(Borders::ALL)
+            .border_set(border::THICK)
+            .render(header_layout[2], buf);
+
+        Block::bordered()
+            .border_set(border::THICK)
+            .render(layout[1], buf);
     }
 }
 
